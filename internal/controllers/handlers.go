@@ -11,10 +11,6 @@ import (
 	"someApp/pkg/postgresql"
 )
 
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "cmd/main/sth.html")
-}
-
 func CreatePerson(w http.ResponseWriter, r *http.Request) {
 	requestBody, _ := ioutil.ReadAll(r.Body)
 
@@ -31,8 +27,7 @@ func CreatePerson(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(errors.Wrap(err, fmt.Sprintf("error in /create: %v\n", err)))
 		return
 	}
-	fmt.Println(person)
-	if err := conn.InsertData(person); err != nil {
+	if err := conn.InsertData(r.Context(), person); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -54,7 +49,11 @@ func GetPersonByID(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(errors.Wrap(err, fmt.Sprintf("error in /get: %v\n", err)))
 		return
 	}
-	person, _ = conn.Get(key)
+	person, err = conn.Get(r.Context(), key)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(person)
 }
@@ -75,7 +74,10 @@ func UpdatePersonByID(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(errors.Wrap(err, fmt.Sprintf("error in /update: %v\n", err)))
 		return
 	}
-	conn.Update(person)
+	if err := conn.Update(r.Context(), person); err != nil {
+		fmt.Println(err)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
@@ -92,6 +94,9 @@ func DeletePersonByID(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(errors.Wrap(err, fmt.Sprintf("error in /delete: %v\n", err)))
 		return
 	}
-	conn.Delete(key)
+	if err := conn.Delete(r.Context(), key); err != nil {
+		fmt.Println(err)
+		return
+	}
 	w.WriteHeader(http.StatusNoContent)
 }
