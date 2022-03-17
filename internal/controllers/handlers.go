@@ -27,7 +27,7 @@ func CreatePerson(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(errors.Wrap(err, fmt.Sprintf("error in /create: %v\n", err)))
 		return
 	}
-	if err := conn.InsertData(person); err != nil {
+	if err := conn.InsertData(r.Context(), person); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -49,7 +49,7 @@ func GetPersonByID(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(errors.Wrap(err, fmt.Sprintf("error in /get: %v\n", err)))
 		return
 	}
-	person, err = conn.Get(key)
+	person, err = conn.Get(r.Context(), key)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -74,7 +74,7 @@ func UpdatePersonByID(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(errors.Wrap(err, fmt.Sprintf("error in /update: %v\n", err)))
 		return
 	}
-	if err := conn.Update(person); err != nil {
+	if err := conn.Update(r.Context(), person); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -94,7 +94,7 @@ func DeletePersonByID(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(errors.Wrap(err, fmt.Sprintf("error in /delete: %v\n", err)))
 		return
 	}
-	if err := conn.Delete(key); err != nil {
+	if err := conn.Delete(r.Context(), key); err != nil {
 		fmt.Println(err)
 		return
 	}
