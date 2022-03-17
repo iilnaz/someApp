@@ -36,7 +36,7 @@ func (st *Storage) InsertData(ctx context.Context, u user.User) error {
 		u.UUID, u.Name, u.Surname, u.Age, u.PhoneNumber)
 
 	if err != nil {
-		err = errors.Wrap(err, "cant insert data")
+		return errors.Wrap(err, "cant insert data")
 	}
 	return err
 }
