@@ -25,12 +25,12 @@ func (st *storage) NewConnection(host string,
 	username string, password string) error {
 	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", username, password,
 		host, port, database)
-	Storage, err := pgx.Connect(context.Background(), dsn)
+	storage, err := pgx.Connect(context.Background(), dsn)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("unable to connect to database: %v\n", err))
 	}
-	st.Conn = Storage
-	return err
+	st.Conn = storage
+	return nil
 }
 
 func (st *storage) InsertData(ctx context.Context, u *domain.User) error {
@@ -43,10 +43,10 @@ func (st *storage) InsertData(ctx context.Context, u *domain.User) error {
 	return err
 }
 
-func (st *storage) Get(ctx context.Context, id string) (*[]domain.User, error) {
+func (st *storage) Get(ctx context.Context, id string) ([]domain.User, error) {
 	rows, err := st.Conn.Query(ctx, "SELECT id, name, surname, age, phone_number FROM users WHERE id = $1", id)
 	if err != nil {
-		err = errors.Wrap(err, "cant make select")
+		return nil, errors.Wrap(err, "cant make select")
 	}
 
 	var rowSlice []domain.User
@@ -55,11 +55,11 @@ func (st *storage) Get(ctx context.Context, id string) (*[]domain.User, error) {
 		var r domain.User
 		err = rows.Scan(&r.UUID, &r.Name, &r.Surname, &r.Age, &r.PhoneNumber)
 		if err != nil {
-			err = errors.Wrap(err, "cant scan")
+			return nil, errors.Wrap(err, "cant scan")
 		}
 		rowSlice = append(rowSlice, r)
 	}
-	return &rowSlice, err
+	return rowSlice, nil
 }
 
 func (st *storage) Update(ctx context.Context, u *domain.User) error {
@@ -69,7 +69,7 @@ func (st *storage) Update(ctx context.Context, u *domain.User) error {
 	if err != nil {
 		return errors.Wrap(err, "cant update data")
 	}
-	return err
+	return nil
 }
 
 func (st *storage) Delete(ctx context.Context, id string) error {
@@ -78,5 +78,5 @@ func (st *storage) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return errors.Wrap(err, "cant delete data")
 	}
-	return err
+	return nil
 }

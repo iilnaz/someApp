@@ -14,19 +14,9 @@ type User struct {
 
 type UserRepo interface {
 	InsertData(ctx context.Context, u *User) error
-	Get(ctx context.Context, id string) (*[]User, error)
+	Get(ctx context.Context, id string) ([]User, error)
 	Update(ctx context.Context, u *User) error
 	Delete(ctx context.Context, id string) error
 	CloseConnection(ctx context.Context)
 	NewConnection(host string, port string, database string, username string, password string) error
 }
-
-/*
-type UserUsecase interface {
-	InsertData(ctx context.Context, u *User) error
-	Get(ctx context.Context, id string) ([]User, error)
-	Update(ctx context.Context, u *User) error
-	Delete(ctx context.Context, id string) error
-}
-
-*/

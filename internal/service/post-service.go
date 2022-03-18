@@ -11,7 +11,7 @@ type service struct {
 
 type PostService interface {
 	Create(ctx context.Context, user *domain.User) error
-	Find(ctx context.Context, id string) (*[]domain.User, error)
+	Find(ctx context.Context, id string) ([]domain.User, error)
 	Update(ctx context.Context, user *domain.User) error
 	Delete(ctx context.Context, id string) error
 }
@@ -24,7 +24,7 @@ func (s *service) Create(ctx context.Context, user *domain.User) error {
 	return s.repo.InsertData(ctx, user)
 }
 
-func (s *service) Find(ctx context.Context, id string) (*[]domain.User, error) {
+func (s *service) Find(ctx context.Context, id string) ([]domain.User, error) {
 	return s.repo.Get(ctx, id)
 }
 

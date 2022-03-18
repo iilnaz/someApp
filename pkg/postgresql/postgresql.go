@@ -17,7 +17,7 @@ func NewConnection(host string,
 		host, port, database)
 	storage, err := pgx.Connect(context.Background(), dsn)
 	if err != nil {
-		err = errors.Wrap(err, fmt.Sprintf("unable to connect to database: %v\n", err))
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to connect to database: %v\n", err))
 	}
-	return storage, err
+	return storage, nil
 }

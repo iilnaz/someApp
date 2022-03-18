@@ -47,7 +47,6 @@ func (c *controller) GetPersonByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["id"]
 
-	var person *[]domain.User
 	person, err := c.service.Find(r.Context(), key)
 	if err != nil {
 		fmt.Println(err)
@@ -61,8 +60,7 @@ func (c *controller) UpdatePersonByID(w http.ResponseWriter, r *http.Request) {
 	requestBody, _ := ioutil.ReadAll(r.Body)
 	var person domain.User
 
-	err := json.Unmarshal(requestBody, &person)
-	if err != nil {
+	if err := json.Unmarshal(requestBody, &person); err != nil {
 		fmt.Println(err)
 		return
 	}
