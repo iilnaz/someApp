@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/gorilla/mux"
-	"net/http"
-	"someApp/internal/controllers"
+	"github.com/pkg/errors"
+	"someApp/internal/controller"
+	router "someApp/internal/http/mux-router"
+	"someApp/internal/repository/postgres"
+	"someApp/internal/service"
+	"someApp/pkg/postgresql"
+
 	"someApp/schema/migrations"
 )
 
@@ -19,13 +24,21 @@ func main() {
 		fmt.Println(err)
 	}
 
-	router := mux.NewRouter()
-	router.HandleFunc("/create", controllers.CreatePerson).Methods("POST")
-	router.HandleFunc("/get/{id}", controllers.GetPersonByID).Methods("GET")
-	router.HandleFunc("/update/{id}", controllers.UpdatePersonByID).Methods("PUT")
-	router.HandleFunc("/delete/{id}", controllers.DeletePersonByID).Methods("DELETE")
-	http.Handle("/", router)
-	fmt.Println("Server is listening...")
-	http.ListenAndServe(":8181", nil)
+	conn, err := postgresql.NewConnection("localhost", "5432",
+		"postgres", "postgres", "postgres")
+	if err != nil {
+		fmt.Println(errors.Wrap(err, fmt.Sprintf("error in /create: %v\n", err)))
+		return
+	}
+	postRepo := postgres.NewPostgresRepo(conn)
+	defer postRepo.CloseConnection(context.Background())
+	postService := service.NewPostService(postRepo)
+	postController := controller.NewController(postService)
+	postRouter := router.NewMuxRouter()
 
+	postRouter.POST("/create", postController.CreatePerson)
+	postRouter.GET("/get/{id}", postController.GetPersonByID)
+	postRouter.PUT("/update/{id}", postController.UpdatePersonByID)
+	postRouter.DELETE("/delete/{id}", postController.DeletePersonByID)
+	postRouter.SERVE(":8181")
 }
