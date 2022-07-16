@@ -1,0 +1,3 @@
+- This is my attempt at writing a simple CRUD application using a clean architecture.
+- Gorilla Mux was used as the router. Postgres was used as the database(raised in the Docker). You can use all what you want, just implement needed interfaces.
+- The application is not overloaded with any specific business logic (more precisely, it has no business logic :)), so it can be used as a template.
